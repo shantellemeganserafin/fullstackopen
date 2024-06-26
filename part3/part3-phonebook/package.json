@@ -1,0 +1,28 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shantellemeganserafin/fullstackopen.git"
+  },
+  "author": "Shantelle Serafin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shantellemeganserafin/fullstackopen/issues"
+  },
+  "homepage": "https://github.com/shantellemeganserafin/fullstackopen#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.19.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
