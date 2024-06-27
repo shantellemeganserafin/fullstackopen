@@ -14,17 +14,17 @@ app.use(cors())
 let notes = [
   {
     id: 1,
-    content: "HTML is easy",
+    content: "ws 1",
     important: true
   },
   {
     id: 2,
-    content: "Browser can execute only JavaScript",
+    content: "ws 2",
     important: false
   },
   {
     id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
+    content: "ws 3",
     important: true
   }
 ]
