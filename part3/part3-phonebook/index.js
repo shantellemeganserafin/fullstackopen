@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const app = express()
 
 // Middleware - Parsing JSON request body
-app.use(express.json())
+//app.use(express.json())
 
 // Create a custom token for the request body
 morgan.token('req-body', (request) => {
@@ -18,7 +18,7 @@ const cors = require('cors')
 app.use(cors())
 
 // Middleware - Express show static content, the page index.html and the JavaScript,
-app.use(express.static('dist'))
+//app.use(express.static('dist'))
 
 let persons = [
     { 
@@ -107,7 +107,7 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 // Start server
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
