@@ -1,7 +1,15 @@
-//backend server in this course is to offer raw data in JSON format to the frontend
+// Purspose - backend server offers raw data in JSON format to the frontend
 const express = require('express')
 const app = express()
 app.use(express.json())
+
+// Middleware - Cross-Origin Resource Sharing
+const cors = require('cors')
+
+// Middleware - Express show static content, the page index.html and the JavaScript
+app.use(express.static('dist'))
+
+app.use(cors())
 
 let notes = [
   {
@@ -73,6 +81,7 @@ app.post('/api/notes', (request, response) => {
     response.json(note)
 })
 
-const PORT = 3001
-app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
