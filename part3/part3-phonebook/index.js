@@ -13,32 +13,28 @@ morgan.token('req-body', (request) => {
 // Use morgan with the custom token
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'));
 
+// Middleware - Cross Origin Resource Sharing
+const cors = require('cors')
+app.use(cors())
+
+// Middleware - Express show static content, the page index.html and the JavaScript,
+app.use(express.static('dist'))
+
 let persons = [
     { 
       "id": "1",
-      "name": "Arto Hellas", 
+      "name": "PB backend 1", 
       "number": "040-123456"
     },
     { 
       "id": "2",
-      "name": "Ada Lovelace", 
+      "name": "PB backend 2", 
       "number": "39-44-5323523"
     },
     { 
       "id": "3",
-      "name": "Dan Abramov", 
+      "name": "PB backend 3", 
       "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-    ,
-    { 
-      "id": "5",
-      "name": "Taylor Swift", 
-      "number": "39-23-232"
     }
 ]
 
