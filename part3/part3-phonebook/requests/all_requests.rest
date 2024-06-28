@@ -14,3 +14,16 @@ Content-Type: application/json
     "name": "chair",
     "number": "13943"
 }
+
+###
+GET https://part3-phonebook-white-river-322.fly.dev/api/persons
+
+###
+POST https://part3-phonebook-white-river-322.fly.dev/api/persons
+Content-Type: application/json
+
+{
+    "name": "chair",
+    "number": "13943"
+}
+

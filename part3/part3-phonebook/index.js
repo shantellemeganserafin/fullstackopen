@@ -1,24 +1,24 @@
 const express = require('express')
 const morgan = require('morgan');
 const app = express()
+const cors = require('cors')
 
 // Middleware - Parsing JSON request body
-//app.use(express.json())
+app.use(express.json())
 
 // Create a custom token for the request body
 morgan.token('req-body', (request) => {
   return JSON.stringify(request.body);
 });
 
-// Use morgan with the custom token
+// Middleware - Use morgan with the custom token
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'));
 
 // Middleware - Cross Origin Resource Sharing
-const cors = require('cors')
 app.use(cors())
 
 // Middleware - Express show static content, the page index.html and the JavaScript,
-//app.use(express.static('dist'))
+app.use(express.static('dist'))
 
 let persons = [
     { 
