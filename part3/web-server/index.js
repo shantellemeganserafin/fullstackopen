@@ -1,17 +1,20 @@
 /*
-* Purspose - backend server offers raw data in JSON format to the frontend
+* This file hosts a RESTful API on a backend server
+* Backend framework - Express.js (Node.js)
+* Integrated with MongoDB
 */
 
+// Built-in Third-party Middleware 
 const express = require('express')
 const app = express()
 const Note = require('./models/note')
-
-app.use(express.static('dist'))
 const cors = require('cors')
 
-app.use(cors())
-app.use(express.json())
+app.use(express.static('dist')) //serves static files form the `dist` directory
+app.use(express.json()) //parses incoming json requests
+app.use(cors()) //enables cross-origin resource sharing
 
+// Route Handlers - functions in a Express application that are responsible for handling HTTP requests to a specific endpoints (or routes)
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
@@ -22,24 +25,24 @@ app.get('/api/notes', (request, response) => {
   })
 })
 
-app.get('/api/notes/:id', (request, response) => {
-  Note.findById(request.params.id).then(note => {
-    response.json(note)
-  })
-})
-
-app.delete('/api/notes/:id', (request, response) => {
-  Note.findByIdAndDelete(request.params.id)
-    .then(result => {
-      if (result) {
-        response.status(204).end()
+app.get('/api/notes/:id', (request, response, next) => {
+  Note.findById(request.params.id)
+    .then(note => {
+      if (note) {
+        response.json(note)
       } else {
-        response.status(404).json({ error: 'note not found' })
+        response.status(404).end()
       }
     })
-    .catch(error => {
-      response.status(500).json({ error: 'failed to delete note' })
+    .catch(error => next(error))
+})
+
+app.delete('/api/notes/:id', (request, response, next) => {
+  Note.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end()
     })
+    .catch(error => next(error))
 })
   
 app.post('/api/notes', (request, response) => {
@@ -59,6 +62,36 @@ app.post('/api/notes', (request, response) => {
       response.json(savedNote)
     })
 })
+
+app.put('/api/notes/:id', (request, response, next) => {
+  const body = request.body
+
+  const note = {
+    content: body.content,
+    important: body.important,
+  }
+
+  Note.findByIdAndUpdate(request.params.id, note, { new: true })
+    .then(updatedNote => {
+      response.json(updatedNote)
+    })
+    .catch(error => next(error))
+})
+
+// Custome Middleware
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint) //handles requests to unknown endpoints
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+  next(error)
+}
+app.use(errorHandler) //handles errors passed to `next`
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
