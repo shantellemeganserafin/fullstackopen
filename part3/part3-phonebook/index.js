@@ -1,89 +1,114 @@
+/*
+* This file hosts a RESTful API on a backend server
+* Backend framework - Express.js (Node.js)
+* Integrated with MongoDB
+*/
+
+// Built-in Third-party Middleware 
 const express = require('express')
 const app = express()
-app.use(express.json())
-app.use(express.static('dist'))
-
-const cors = require('cors')
-app.use(cors())
-
-const morgan = require('morgan');
-morgan.token('req-body', (request) => {
-  return JSON.stringify(request.body);
-});
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'));
-
 const Entry = require('./models/entry')
+const cors = require('cors')
+const morgan = require('morgan');
+morgan.token('req-body', (request) => { return JSON.stringify(request.body);});
 
-/* app.get('/api/info', (request, response) => {
+app.use(express.static('dist')) //serves static files form the `dist` directory
+app.use(express.json()) //parses incoming json requests
+app.use(cors()) //enables cross-origin resource sharing
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body')); //log HTTP request
+
+// Route Handlers - functions in a Express application that are responsible for handling HTTP requests to a specific endpoints (or routes)
+app.get('/api/info', (request, response, next) => {
+  Entry.find({}).then(entries => {
     const date = new Date()
-    const info = `
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${date}</p>
-    `
+    const info = 
+    ` <p>Phonebook has info for ${entries.length} people</p>
+      <p>${date}</p> `
     response.send(info)
-}) */
+  }).catch(error => next(error))
+})
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
   Entry.find({}).then(entries=> {
     response.json(entries)
-  })
+  }).catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Entry.findById(request.params.id).then(entry => {
-    response.json(entry)
-  })
+    if (entry){
+      response.json(entry)
+    } else {
+      response.status(404).end()
+    }
+  }).catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  Entry.findByIdAndDelete(request.params.id)
-    .then(result => {
+app.delete('/api/persons/:id', (request, response, next) => {
+  Entry.findByIdAndDelete(request.params.id).then(result => {
       if (result) {
         response.status(204).end()
       } else {
         response.status(404).json({ error: 'entry not found' })
       }
-    })
-    .catch(error => {
-      response.status(500).json({ error: 'failed to delete entry' })
-    })
+    }).catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
-    const body = request.body
-  
-    if (!body.name|| !body.number) {
-      return response.status(400).json({ 
-        error: 'need both name and number' 
-      })
-    }
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body
 
-  /*
-  const nameExists = persons.some(person => person.name === body.name);
-    if (nameExists) {
-        return response.status(400).json({ 
-            error: 'name must be unique' 
-        });
-    } */
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'need both name and number' 
+    })
+  }
 
-    const entry = new Entry ({
-      name: body.name,
-      number: body.number,
-    })
-  
-    entry.save().then(savedEntry => {
-      console.log('entry saved')
-      response.json(savedEntry)
-    })
-  
+  const entry = new Entry({
+    name: body.name,
+    number: body.number,
+  })
+
+  entry.save().then(savedEntry => {
+    console.log('entry saved')
+    response.json(savedEntry)
+  }).catch(error => next(error))
+
 })
 
-// Middlware for handling unknown endpoints
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+
+  const entry = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Entry.findByIdAndUpdate(request.params.id, entry, { new: true })
+    .then(updatedEntry => {
+      if (!updatedEntry){
+        return response.status(404).json({ error: 'Update failed' })
+      }
+      response.json(updatedEntry)
+    })
+    .catch(error => next(error))
+})
+
+// Custome Middleware
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
+app.use(unknownEndpoint) //handles requests to unknown endpoints
 
-app.use(unknownEndpoint)
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+app.use(errorHandler) //handles errors passed to `next`
 
 // Start server
 const PORT = process.env.PORT || 3001

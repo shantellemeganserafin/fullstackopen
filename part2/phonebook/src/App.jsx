@@ -32,23 +32,21 @@ const App = () => {
     const existingPerson = persons.find(person => person.name === newName)
 
     if(existingPerson){
-      const confirmation = window.confirm(`${newName} is already added to phonebook, replace the old number with the new one?`)
+      const confirmation = window.confirm(`'${newName}' is already added to phonebook, replace the old number with the new one?`)
 
       if (confirmation){
-        const updatedPerson = { ...existingPerson, number: newNumber }
+        const updatedPerson = { ...existingPerson, number: newNumber}
         personService
         .updateNumber(existingPerson.id, updatedPerson)
         .then(response => {
-          setPersons(persons.map(person =>
-            person.id !== existingPerson.id ? person : response.data
-          ))
+          setPersons(persons.map(person =>person.id !== existingPerson.id ? person : response.data))
           setNewName('')
           setNewNumber('')
           setNotification({message:`Updated '${existingPerson.name}' phone number`, type:'success'})
           setTimeout(() => {setNotification({message: null, type:''})}, 5000)
-        })
-        .catch(error => {
-          setNotification({message: `${existingPerson.name} was already removed from the server`, type:''})
+        }
+      ).catch(error => {
+          setNotification({message: `'${existingPerson.name}' was already removed from the server`, type:''})
           setTimeout(() => {setNotification({message: null, type:''})}, 5000)
           setPersons(persons.filter(p => p.id !== existingPerson.id))
           setNewName('')
@@ -70,13 +68,24 @@ const App = () => {
 
   const deleteName = (id) => {
     const personToDelete = persons.find(person => person.id === id)
-    const confirmation = window.confirm(`Delete ${personToDelete.name}?`)
+    const confirmation = window.confirm(`Delete '${personToDelete.name}'?`)
   
     if (confirmation) {
       personService
         .deleteName(id)
         .then(response => {
           setPersons(persons.filter(person => person.id !== id))
+          setNewName('')
+          setNewNumber('')
+          setNotification({message:`Deleted '${personToDelete.name}'`, type:'success'})
+          setTimeout(() => {setNotification({message: null, type:''})}, 5000)
+        })
+        .catch(error => {
+          setNotification({message: `'${personToDelete.name}' was already removed from the server`, type:''})
+          setTimeout(() => {setNotification({message: null, type:''})}, 10000)
+          setPersons(persons.filter(p => p.id !== personToDelete.id))
+          setNewName('')
+          setNewNumber('')
         })
     }
   }

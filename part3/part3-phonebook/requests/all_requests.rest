@@ -1,18 +1,31 @@
+###
+GET http://localhost:3001/api/info
+
+###
 GET http://localhost:3001/api/persons
 
 ###
-GET http://localhost:3001/api/persons/667f284a69ab87df71cd12be
+GET http://localhost:3001/api/persons/667f298633881bc6a8708a09
 
 ###
-DELETE http://localhost:3001/api/persons/667f284a69ab87df71cd12be
+DELETE http://localhost:3001/api/persons/667fb8f98d99e065629f0737
 
 ###
 POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-  "name": "bruno mars",
+  "name": "tilly",
   "number": "13943"
+}
+
+###
+PUT http://localhost:3001/api/persons/667fb8f98d99e065629f0737
+Content-Type: application/json
+
+{
+  "name": "tilly",
+  "number": "2738423"
 }
 
 ###
