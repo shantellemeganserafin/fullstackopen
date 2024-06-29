@@ -1,84 +1,63 @@
-// Purspose - backend server offers raw data in JSON format to the frontend
+/*
+* Purspose - backend server offers raw data in JSON format to the frontend
+*/
+
 const express = require('express')
 const app = express()
-app.use(express.json())
+const Note = require('./models/note')
 
-// Middleware - Cross-Origin Resource Sharing
+app.use(express.static('dist'))
 const cors = require('cors')
 
-// Middleware - Express show static content, the page index.html and the JavaScript
-app.use(express.static('dist'))
-
 app.use(cors())
-
-let notes = [
-  {
-    id: 1,
-    content: "ws 1",
-    important: true
-  },
-  {
-    id: 2,
-    content: "ws 2",
-    important: false
-  },
-  {
-    id: 3,
-    content: "ws 3",
-    important: true
-  }
-]
+app.use(express.json())
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/notes', (request, response) => {
+  Note.find({}).then(notes => {
     response.json(notes)
+  })
 })
 
 app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const note = notes.find(note => note.id === id)
-    if (note) {
-        response.json(note)
-    } else {
-        response.status(404).end()
-    }
+  Note.findById(request.params.id).then(note => {
+    response.json(note)
+  })
 })
 
 app.delete('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    notes = notes.filter(note => note.id !== id)
-  
-    response.status(204).end()
+  Note.findByIdAndDelete(request.params.id)
+    .then(result => {
+      if (result) {
+        response.status(204).end()
+      } else {
+        response.status(404).json({ error: 'note not found' })
+      }
+    })
+    .catch(error => {
+      response.status(500).json({ error: 'failed to delete note' })
+    })
 })
-
-const generateId = () => {
-    const maxId = notes.length > 0
-      ? Math.max(...notes.map(n => Number(n.id)))
-      : 0
-    return String(maxId + 1)
-}
   
 app.post('/api/notes', (request, response) => {
     const body = request.body
   
-    if (!body.content) {
-      return response.status(400).json({ 
-        error: 'content missing' 
-      })
+    if (body.content === undefined) {
+      return response.status(400).json({ error: 'content missing' })
     }
   
-    const note = {
+    const note = new Note({
       content: body.content,
-      important: Boolean(body.important) || false,
-      id: generateId(),
-    }
+      important: body.important || false,
+    })
   
-    notes = notes.concat(note)
-  
-    response.json(note)
+    note.save().then(savedNote => {
+      console.log('noted saved!')
+      response.json(savedNote)
+    })
 })
 
 const PORT = process.env.PORT || 3001

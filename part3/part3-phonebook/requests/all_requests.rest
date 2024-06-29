@@ -1,18 +1,18 @@
 GET http://localhost:3001/api/persons
 
 ###
-GET http://localhost:3001/api/persons/16
+GET http://localhost:3001/api/persons/667f284a69ab87df71cd12be
 
 ###
-DELETE http://localhost:3001/api/persons/3
+DELETE http://localhost:3001/api/persons/667f284a69ab87df71cd12be
 
 ###
 POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-    "name": "chair",
-    "number": "13943"
+  "name": "bruno mars",
+  "number": "13943"
 }
 
 ###
@@ -21,7 +21,6 @@ GET https://part3-phonebook-white-river-322.fly.dev/api/persons
 ###
 POST https://part3-phonebook-white-river-322.fly.dev/api/persons
 Content-Type: application/json
-
 {
     "name": "chair",
     "number": "13943"
