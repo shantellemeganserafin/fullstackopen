@@ -45,12 +45,8 @@ app.delete('/api/notes/:id', (request, response, next) => {
     .catch(error => next(error))
 })
   
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
     const body = request.body
-  
-    if (body.content === undefined) {
-      return response.status(400).json({ error: 'content missing' })
-    }
   
     const note = new Note({
       content: body.content,
@@ -61,17 +57,17 @@ app.post('/api/notes', (request, response) => {
       console.log('noted saved!')
       response.json(savedNote)
     })
+    .catch(error => next(error))
 })
 
 app.put('/api/notes/:id', (request, response, next) => {
-  const body = request.body
+  const { content, important } = request.body
 
-  const note = {
-    content: body.content,
-    important: body.important,
-  }
-
-  Note.findByIdAndUpdate(request.params.id, note, { new: true })
+  Note.findByIdAndUpdate(
+    request.params.id, 
+    { content, important },
+    { new: true, runValidators: true, context: 'query' }
+  ) 
     .then(updatedNote => {
       response.json(updatedNote)
     })
@@ -88,7 +84,10 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  }  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
   next(error)
 }
 app.use(errorHandler) //handles errors passed to `next`
