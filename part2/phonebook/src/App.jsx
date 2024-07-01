@@ -46,9 +46,12 @@ const App = () => {
           setTimeout(() => {setNotification({message: null, type:''})}, 5000)
         }
       ).catch(error => {
-          setNotification({message: `'${existingPerson.name}' was already removed from the server`, type:''})
+          setNotification({message: error.response.data.error, type:''})
           setTimeout(() => {setNotification({message: null, type:''})}, 5000)
-          setPersons(persons.filter(p => p.id !== existingPerson.id))
+          personService.getAll()
+            .then(currentPersons => {
+            setPersons(currentPersons)
+          })
           setNewName('')
           setNewNumber('')
         })
@@ -62,6 +65,10 @@ const App = () => {
             setNewNumber('')
             setNotification({message:`Added '${returnedPerson.name}'`, type:'success'})
             setTimeout(() => {setNotification({message: null, type:''})}, 5000)
+        })
+        .catch(error => {
+          setNotification({message: error.response.data.error, type:''})
+          setTimeout(() => {setNotification({message: null, type:''})}, 10000)
         })
       }
   }
