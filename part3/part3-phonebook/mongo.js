@@ -24,24 +24,24 @@ const Entry = mongoose.model('Entry', entrySchema)
 
 // If giving the correct arguments, adding a new entry
 if (process.argv.length > 3) {
-    const name = process.argv[3]
-    const number = process.argv[4]
+  const name = process.argv[3]
+  const number = process.argv[4]
 
-    const entry = new Entry({
-        name: name,
-        number: number,
-    })
+  const entry = new Entry({
+    name: name,
+    number: number,
+  })
 
-    entry.save().then(result => {
-        console.log(`added ${name} number ${number} to phonebook`)
-        mongoose.connection.close()
-    })
+  entry.save().then(() => {
+    console.log(`added ${name} number ${number} to phonebook`)
+    mongoose.connection.close()
+  })
 } else{
-    // Printing all entries
-    Entry.find({}).then(result => {
-        result.forEach(entry => {
-          console.log(entry.name, entry.number)
-        })
-        mongoose.connection.close()
+  // Printing all entries
+  Entry.find({}).then(result => {
+    result.forEach(entry => {
+      console.log(entry.name, entry.number)
     })
+    mongoose.connection.close()
+  })
 }

@@ -9,7 +9,7 @@ console.log('connecting to', url)
 
 mongoose.connect(url)
 
-  .then(result => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch(error => {
@@ -18,15 +18,15 @@ mongoose.connect(url)
 
 // Custom validator function
 const phoneNumberValidator = (phoneNum) => {
-  
+
   // Phone number should have length of 8 or more
   if (phoneNum.length < 8) {
     return false
   }
 
   // Regular expression to match the required phone number format
-  const regex = /^\d{2,3}-\d+$/;
-  return regex.test(phoneNum);
+  const regex = /^\d{2,3}-\d+$/
+  return regex.test(phoneNum)
 }
 
 const entrySchema = new mongoose.Schema({

@@ -4,24 +4,24 @@
 * Integrated with MongoDB
 */
 
-// Built-in Third-party Middleware 
+// Built-in Third-party Middleware
 const express = require('express')
 const app = express()
 const Entry = require('./models/entry')
 const cors = require('cors')
-const morgan = require('morgan');
-morgan.token('req-body', (request) => { return JSON.stringify(request.body);});
+const morgan = require('morgan')
+morgan.token('req-body', (request) => { return JSON.stringify(request.body)})
 
 app.use(express.static('dist')) //serves static files form the `dist` directory
 app.use(express.json()) //parses incoming json requests
 app.use(cors()) //enables cross-origin resource sharing
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body')); //log HTTP request
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body')) //log HTTP request
 
 // Route Handlers - functions in a Express application that are responsible for handling HTTP requests to a specific endpoints (or routes)
 app.get('/api/info', (request, response, next) => {
   Entry.find({}).then(entries => {
     const date = new Date()
-    const info = 
+    const info =
     ` <p>Phonebook has info for ${entries.length} people</p>
       <p>${date}</p> `
     response.send(info)
@@ -29,7 +29,7 @@ app.get('/api/info', (request, response, next) => {
 })
 
 app.get('/api/persons', (request, response, next) => {
-  Entry.find({}).then(entries=> {
+  Entry.find({}).then(entries => {
     response.json(entries)
   }).catch(error => next(error))
 })
@@ -46,12 +46,12 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Entry.findByIdAndDelete(request.params.id).then(result => {
-      if (result) {
-        response.status(204).end()
-      } else {
-        response.status(404).json({ error: 'entry not found' })
-      }
-    }).catch(error => next(error))
+    if (result) {
+      response.status(204).end()
+    } else {
+      response.status(404).json({ error: 'entry not found' })
+    }
+  }).catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response, next) => {
@@ -72,11 +72,11 @@ app.post('/api/persons', (request, response, next) => {
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-  const {name, number} = request.body
-  
+  const { name, number } = request.body
+
   Entry.findByIdAndUpdate(
     request.params.id,
-    {name, number},
+    { name, number },
     { new: true, runValidators: true, context: 'query' }
   )
     .then(updatedEntry => {
@@ -100,7 +100,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError'){
-    return response.status(400).json({error: error.message})
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)
