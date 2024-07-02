@@ -4,7 +4,7 @@
 * Integrated with MongoDB
 */
 
-// Built-in Third-party Middleware 
+// Built-in Third-party Middleware
 const express = require('express')
 const app = express()
 const Note = require('./models/note')
@@ -16,7 +16,7 @@ app.use(cors()) //enables cross-origin resource sharing
 
 // Route Handlers - functions in a Express application that are responsible for handling HTTP requests to a specific endpoints (or routes)
 app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
+  response.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/notes', (request, response) => {
@@ -39,24 +39,24 @@ app.get('/api/notes/:id', (request, response, next) => {
 
 app.delete('/api/notes/:id', (request, response, next) => {
   Note.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
 })
-  
+
 app.post('/api/notes', (request, response, next) => {
-    const body = request.body
-  
-    const note = new Note({
-      content: body.content,
-      important: body.important || false,
-    })
-  
-    note.save().then(savedNote => {
-      console.log('noted saved!')
-      response.json(savedNote)
-    })
+  const body = request.body
+
+  const note = new Note({
+    content: body.content,
+    important: body.important || false,
+  })
+
+  note.save().then(savedNote => {
+    console.log('noted saved!')
+    response.json(savedNote)
+  })
     .catch(error => next(error))
 })
 
@@ -64,10 +64,10 @@ app.put('/api/notes/:id', (request, response, next) => {
   const { content, important } = request.body
 
   Note.findByIdAndUpdate(
-    request.params.id, 
+    request.params.id,
     { content, important },
     { new: true, runValidators: true, context: 'query' }
-  ) 
+  )
     .then(updatedNote => {
       response.json(updatedNote)
     })

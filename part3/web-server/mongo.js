@@ -9,7 +9,7 @@ const password = process.argv[2]
 
 const url =
   `mongodb+srv://shantellemegan:${password}@fullstackopen.klugkkk.mongodb.net/noteApp?retryWrites=true&w=majority&appName=FullStackOpen`
-  
+
 
 mongoose.set('strictQuery',false)
 
@@ -22,10 +22,10 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model('Note', noteSchema)
 
-const note = new Note({
+/* const note = new Note({
   content: 'Karma is my boyfriend',
   important: true,
-})
+}) */
 
 /* note.save().then(result => {
   console.log('note saved!')
@@ -34,8 +34,8 @@ const note = new Note({
  */
 
 Note.find({}).then(result => {
-    result.forEach(note => {
-      console.log(note)
-    })
-    mongoose.connection.close()
+  result.forEach(note => {
+    console.log(note)
+  })
+  mongoose.connection.close()
 })
